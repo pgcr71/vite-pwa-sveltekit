@@ -105,8 +105,9 @@ function createManifestTransform(base: string, options?: KitOptions): ManifestTr
           urls = imp.manifest._.routes.map(({ id }: { id: string }) => id)
         }
         return urls.map((url) => {
-          e.url = url
-          return e
+          const clonedE = { ...e }
+          clonedE.url = url
+          return clonedE
         })
       }),
 
@@ -124,8 +125,10 @@ function buildGlobPatterns(globPatterns?: string[]): string[] {
     if (!globPatterns.some(g => g.startsWith('client/')))
       globPatterns.push('client/**/*.{js,css,ico,png,svg,webp}')
 
+    if (!globPatterns.some(g => g.startsWith('server/')))
+      globPatterns.push('server/manifest.js')
     return globPatterns
   }
 
-  return ['client/**/*.{js,css,ico,png,svg,webp}', 'prerendered/**/*.html']
+  return ['client/**/*.{js,css,ico,png,svg,webp}', 'prerendered/**/*.html', 'server/manifest.js']
 }
