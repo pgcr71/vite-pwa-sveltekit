@@ -1,8 +1,8 @@
+import * as path from 'path'
 import type { ResolvedConfig } from 'vite'
 import type { ManifestTransform } from 'workbox-build'
 import type { VitePWAOptions } from 'vite-plugin-pwa'
 import type { KitOptions } from './types'
-import * as path from 'path'
 
 export function configureSvelteKitOptions(
   kit: KitOptions,
@@ -97,17 +97,21 @@ function createManifestTransform(base: string, options?: KitOptions): ManifestTr
     // server rendered routes are in server folder
     const serverManifest = await Promise.all(
       entries.map(async (e) => {
-        let urls: string[] = [];
-        if (e.url.startsWith("server/manifest-full.js")) {
+        let urls: string[] = []
+        if (e.url.startsWith('server/manifest.js')) {
           const imp = await import(
-            path.resolve("./.svelte-kit/output/server/manifest-full.js")
-          );
-          urls = imp.manifest._.routes.map(({ id }: { id: string }) => id);
+            path.resolve('./.svelte-kit/output/server/manifest.js')
+          )
+          urls = imp.manifest._.routes.map(({ id }: { id: string }) => id)
         }
-       return urls.map((url) => {e.url = url; return e})
-      })
-   
-    );
+        return urls.map((url) => {
+          e.url = url
+          return e
+        })
+      }),
+
+    )
+
     return { manifest: [...manifest, ...serverManifest.flat()] }
   }
 }
