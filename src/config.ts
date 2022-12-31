@@ -2,6 +2,7 @@ import type { ResolvedConfig } from 'vite'
 import type { ManifestTransform } from 'workbox-build'
 import type { VitePWAOptions } from 'vite-plugin-pwa'
 import type { KitOptions } from './types'
+import * as path from 'path'
 
 export function configureSvelteKitOptions(
   kit: KitOptions,
@@ -93,7 +94,23 @@ function createManifestTransform(base: string, options?: KitOptions): ManifestTr
       return e
     })
 
-    return { manifest }
+    const serverManifest = await Promise.all(
+      entries.map(async (e) => {
+        let urls: string[] = [];
+        if (e.url.startsWith("server/manifest-full.js")) {
+          const imp = await import(
+            path.resolve("./.svelte-kit/output/server/manifest-full.js")
+          );
+          urls = imp.manifest._.routes.map(({ id }: { id: string }) => id);
+        }
+       return urls.map((url) => {e.url = url; return e})
+      })
+   
+    );
+
+      console.log([...manifest, ...serverManifest.flat()])
+
+    return { manifest: [...manifest, ...serverManifest.flat()] }
   }
 }
 
