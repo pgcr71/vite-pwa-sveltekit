@@ -94,6 +94,7 @@ function createManifestTransform(base: string, options?: KitOptions): ManifestTr
       return e
     })
 
+    // server rendered routes are in server folder
     const serverManifest = await Promise.all(
       entries.map(async (e) => {
         let urls: string[] = [];
@@ -107,9 +108,6 @@ function createManifestTransform(base: string, options?: KitOptions): ManifestTr
       })
    
     );
-
-      console.log([...manifest, ...serverManifest.flat()])
-
     return { manifest: [...manifest, ...serverManifest.flat()] }
   }
 }
