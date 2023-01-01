@@ -67,7 +67,7 @@ function createManifestTransform(base: string, options?: KitOptions): ManifestTr
     }
 
     // the fallback will be always in .svelte-kit/output/prerendered/fallback.html
-    const manifest = entries.filter(({ url }) => !(excludeFallback && url === defaultAdapterFallback)).map((e) => {
+    const manifest = entries.filter(({ url }) => !((excludeFallback && url === defaultAdapterFallback) || url === 'server/manifest.js')).map((e) => {
       let url = e.url
       // client assets in `.svelte-kit/output/client` folder.
       // SSG pages in `.svelte-kit/output/prerendered/pages` folder.
@@ -102,7 +102,7 @@ function createManifestTransform(base: string, options?: KitOptions): ManifestTr
           const imp = await import(
             path.resolve('./.svelte-kit/output/server/manifest.js')
           )
-          urls = imp.manifest._.routes.map(({ id }: { id: string }) => id)
+          urls = imp.manifest._.routes.filter(({ page }: { page: string }) => page).map(({ id }: { id: string }) => id)
         }
         return urls.map((url) => {
           const clonedE = { ...e }
